@@ -1,0 +1,50 @@
+# ============ DATA PARAMETERS ============
+dataset: network_traffic
+seq_len: 90             
+input_channels: 1
+
+# ============ TIME-TO-IMAGE TRANSFORMATION ============
+delay: 1                
+embedding: 48            
+img_resolution: 48       
+
+# ============ TRAINING PARAMETERS ============
+batch_size: 48           
+learning_rate: 0.00005    
+epochs: 6000             
+weight_decay: 0.00001
+
+# ============ EMA SETTINGS ============
+ema: true
+ema_warmup: 150          # INCREASED: Let model learn distribution first
+
+# ============ MODEL ARCHITECTURE ============
+# LARGER model to capture sharp peaks
+unet_channels: 96        # INCREASED from 64
+ch_mult: [1, 2, 4, 4]    # ADDED one more level
+num_res_blocks: 4        # INCREASED from 2
+attn_resolution: [24, 12, 6] # INCREASED attention
+dropout: 0.0            # REDUCED: Less regularization to learn sharp peaks
+
+# ============ DIFFUSION PARAMETERS ============
+sampling_timesteps: 1000  # More sampling steps for precision
+
+# ============ SYSTEM PARAMETERS ============
+num_workers: 0
+logging_iter: 100
+diffusion_steps: 10
+seed: 42
+
+# ============ TRANSFORMATION ============
+use_stft: false
+
+# ============ NOTES ============
+# This config targets the bimodal distribution problem:
+# 1. Larger model to capture sharp peak at 1.0
+# 2. Longer sequences for better pattern context
+# 3. More training epochs for convergence
+# 4. Less dropout to avoid over-smoothing
+# 5. More careful learning rate
+
+beta1: 0.00001
+betaT: 0.02

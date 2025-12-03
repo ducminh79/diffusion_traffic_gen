@@ -1,0 +1,55 @@
+# OPTIMIZED configuration for single-feature packet size generation
+# This config is specifically tuned for 1D time series (bytes_per_interval only)
+
+# ============ DATA PARAMETERS ============
+dataset: network_traffic
+seq_len: 64              # INCREASED: Single feature needs longer context
+input_channels: 1        # Single feature
+
+# ============ TIME-TO-IMAGE TRANSFORMATION ============
+# For 1 feature, the delay embedding creates a trajectory in 2D space
+# Rule: delay * embedding ≈ seq_len (for good coverage)
+delay: 16                # ADJUSTED: Smaller delay for 1D
+embedding: 16            # ADJUSTED: Creates 16x16 embedding space
+# Note: 16 * 16 = 256 embedding points from 64-length sequence
+
+# ============ IMAGE RESOLUTION ============
+img_resolution: 16       # REDUCED: 1 feature needs smaller image
+                        # Rule: img_resolution should match embedding dimension
+
+# ============ TRAINING PARAMETERS ============
+batch_size: 32           # Can be larger for 1 feature (less memory)
+learning_rate: 0.0005    # Slightly higher for faster convergence
+epochs: 600              # INCREASED: 1 feature needs more epochs
+weight_decay: 0.00001
+
+# ============ EMA SETTINGS ============
+ema: true
+ema_warmup: 100          # INCREASED: Give model more time to learn patterns
+
+# ============ MODEL ARCHITECTURE ============
+# Smaller model since we only have 1 feature
+unet_channels: 64        # REDUCED from 128
+ch_mult: [1, 2, 4]       # REDUCED: One less level (no 8x)
+num_res_blocks: 2
+attn_resolution: [8]     # ADJUSTED: Match the resolution levels
+dropout: 0.1             # Added dropout for regularization
+
+# ============ DIFFUSION PARAMETERS ============
+sampling_timesteps: 150  # Can be lower for simpler 1D data
+diffusion_steps: 30
+# ============ SYSTEM PARAMETERS ============
+num_workers: 0           # Keep at 0 to avoid core dump
+logging_iter: 100
+seed: 42
+
+# ============ TRANSFORMATION ============
+use_stft: false          # Use delay embedding
+
+# ============ NOTES ============
+# Key principles for 1-feature tuning:
+# 1. Smaller image resolution (16 instead of 32-48)
+# 2. Smaller model (fewer channels, fewer levels)
+# 3. Longer sequences (more context for 1D patterns)
+# 4. More epochs (simpler model needs more training)
+# 5. Smaller delay embedding (16x16 instead of 46x48)

@@ -1,0 +1,37 @@
+# Configuration for single feature (bytes-only) Netflix traffic data
+
+# Data parameters
+dataset: network_traffic
+seq_len: 48              # Increased for better pattern capture
+input_channels: 1        # Changed from 2 to 1 for single feature
+
+# Model parameters - adjusted for single feature
+img_resolution: 32       # Smaller resolution for single feature
+delay: 15               # Reduced delay for single feature
+embedding: 32           # Reduced embedding dimension
+use_stft: false
+# Training parameters
+batch_size: 64
+learning_rate: 0.0005
+epochs: 600
+weight_decay: 0.00001
+
+# EMA settings
+ema: true
+ema_warmup: 50
+
+# Diffusion parameters
+diffusion_steps: 18
+unet_channels: 128
+ch_mult: [1, 2, 4, 4]
+num_res_blocks: 2
+attn_resolution: [16]
+dropout: 0.0
+
+# Sampling
+sampling_timesteps: 250
+
+# Other
+logging_iter: 100
+num_workers: 0
+seed: 42
